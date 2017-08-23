@@ -57,7 +57,7 @@ Installation
 	
 	
 	Install PHP
-	sudo apt-get install php libapache2-mod-php php-mcrypt php-mysql
+	sudo apt-get install php libapache2-mod-php php-mcrypt php-mysql php5-curl
 	sudo nano /etc/apache2/mods-enabled/dir.conf
 	...
 	sudo systemctl restart apache2
@@ -97,113 +97,114 @@ Installation
 	
 4 - Install ffmpeg
 	https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu
-cd ~
-sudo apt-get update
-sudo apt-get -y install autoconf automake build-essential libass-dev libfreetype6-dev \
-libsdl2-dev libtheora-dev libtool libva-dev libvdpau-dev libvorbis-dev libxcb1-dev libxcb-shm0-dev \
-libxcb-xfixes0-dev pkg-config texinfo wget zlib1g-dev
 
-mkdir ~/ffmpeg_sources
+	cd ~
+	sudo apt-get update
+	sudo apt-get -y install autoconf automake build-essential libass-dev libfreetype6-dev \
+	libsdl2-dev libtheora-dev libtool libva-dev libvdpau-dev libvorbis-dev libxcb1-dev libxcb-shm0-dev \
+	libxcb-xfixes0-dev pkg-config texinfo wget zlib1g-dev
 
-sudo apt-get install yasm
-cd ~/ffmpeg_sources
-wget http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
-tar xzvf yasm-1.3.0.tar.gz
-cd yasm-1.3.0
-./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin"
-make
-make install	
+	mkdir ~/ffmpeg_sources
 
-cd ~/ffmpeg_sources
-wget http://www.nasm.us/pub/nasm/releasebuilds/2.13.01/nasm-2.13.01.tar.bz2
-tar xjvf nasm-2.13.01.tar.bz2
-cd nasm-2.13.01
-./autogen.sh
-PATH="$HOME/bin:$PATH" ./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin"
-PATH="$HOME/bin:$PATH" make
-make install
+	sudo apt-get install yasm
+	cd ~/ffmpeg_sources
+	wget http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
+	tar xzvf yasm-1.3.0.tar.gz
+	cd yasm-1.3.0
+	./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin"
+	make
+	make install	
 
-sudo apt-get install libx264-dev
-cd ~/ffmpeg_sources
-wget http://download.videolan.org/pub/x264/snapshots/last_x264.tar.bz2
-tar xjvf last_x264.tar.bz2
-cd x264-snapshot*
-PATH="$HOME/bin:$PATH" ./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin" --enable-static --disable-opencl
-PATH="$HOME/bin:$PATH" make
-make install
+	cd ~/ffmpeg_sources
+	wget http://www.nasm.us/pub/nasm/releasebuilds/2.13.01/nasm-2.13.01.tar.bz2
+	tar xjvf nasm-2.13.01.tar.bz2
+	cd nasm-2.13.01
+	./autogen.sh
+	PATH="$HOME/bin:$PATH" ./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin"
+	PATH="$HOME/bin:$PATH" make
+	make install
 
-sudo apt-get install libx265-dev
-sudo apt-get install cmake mercurial
-cd ~/ffmpeg_sources
-hg clone https://bitbucket.org/multicoreware/x265
-cd ~/ffmpeg_sources/x265/build/linux
-PATH="$HOME/bin:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$HOME/ffmpeg_build" -DENABLE_SHARED:bool=off ../../source
-make
-make install
+	sudo apt-get install libx264-dev
+	cd ~/ffmpeg_sources
+	wget http://download.videolan.org/pub/x264/snapshots/last_x264.tar.bz2
+	tar xjvf last_x264.tar.bz2
+	cd x264-snapshot*
+	PATH="$HOME/bin:$PATH" ./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin" --enable-static --disable-opencl
+	PATH="$HOME/bin:$PATH" make
+	make install
 
-sudo apt-get install libfdk-aac-dev
-cd ~/ffmpeg_sources
-wget -O fdk-aac.tar.gz https://github.com/mstorsjo/fdk-aac/tarball/master
-tar xzvf fdk-aac.tar.gz
-cd mstorsjo-fdk-aac*
-autoreconf -fiv
-./configure --prefix="$HOME/ffmpeg_build" --disable-shared
-make
-make install
+	sudo apt-get install libx265-dev
+	sudo apt-get install cmake mercurial
+	cd ~/ffmpeg_sources
+	hg clone https://bitbucket.org/multicoreware/x265
+	cd ~/ffmpeg_sources/x265/build/linux
+	PATH="$HOME/bin:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$HOME/ffmpeg_build" -DENABLE_SHARED:bool=off ../../source
+	make
+	make install
 
-sudo apt-get install libmp3lame-dev
-cd ~/ffmpeg_sources
-wget http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz
-tar xzvf lame-3.99.5.tar.gz
-cd lame-3.99.5
-./configure --prefix="$HOME/ffmpeg_build" --enable-nasm --disable-shared
-make
-make install
+	sudo apt-get install libfdk-aac-dev
+	cd ~/ffmpeg_sources
+	wget -O fdk-aac.tar.gz https://github.com/mstorsjo/fdk-aac/tarball/master
+	tar xzvf fdk-aac.tar.gz
+	cd mstorsjo-fdk-aac*
+	autoreconf -fiv
+	./configure --prefix="$HOME/ffmpeg_build" --disable-shared
+	make
+	make install
 
-sudo apt-get install libopus-dev
-cd ~/ffmpeg_sources
-wget https://archive.mozilla.org/pub/opus/opus-1.1.5.tar.gz
-tar xzvf opus-1.1.5.tar.gz
-cd opus-1.1.5
-./configure --prefix="$HOME/ffmpeg_build" --disable-shared
-make
-make install	
+	sudo apt-get install libmp3lame-dev
+	cd ~/ffmpeg_sources
+	wget http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz
+	tar xzvf lame-3.99.5.tar.gz
+	cd lame-3.99.5
+	./configure --prefix="$HOME/ffmpeg_build" --enable-nasm --disable-shared
+	make
+	make install
 
-sudo apt-get install libvpx-dev
-sudo apt-get install git
+	sudo apt-get install libopus-dev
+	cd ~/ffmpeg_sources
+	wget https://archive.mozilla.org/pub/opus/opus-1.1.5.tar.gz
+	tar xzvf opus-1.1.5.tar.gz
+	cd opus-1.1.5
+	./configure --prefix="$HOME/ffmpeg_build" --disable-shared
+	make
+	make install	
 
-cd ~/ffmpeg_sources
-git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git
-cd libvpx
-PATH="$HOME/bin:$PATH" ./configure --prefix="$HOME/ffmpeg_build" --disable-examples --disable-unit-tests --enable-vp9-highbitdepth
-PATH="$HOME/bin:$PATH" make
-make install
+	sudo apt-get install libvpx-dev
+	sudo apt-get install git
 
-cd ~/ffmpeg_sources
-wget http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2
-tar xjvf ffmpeg-snapshot.tar.bz2
-cd ffmpeg
-PATH="$HOME/bin:$PATH" PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" ./configure \
-  --prefix="$HOME/ffmpeg_build" \
-  --pkg-config-flags="--static" \
-  --extra-cflags="-I$HOME/ffmpeg_build/include" \
-  --extra-ldflags="-L$HOME/ffmpeg_build/lib" \
-  --bindir="$HOME/bin" \
-  --enable-gpl \
-  --enable-libass \
-  --enable-libfdk-aac \
-  --enable-libfreetype \
-  --enable-libmp3lame \
-  --enable-libopus \
-  --enable-libtheora \
-  --enable-libvorbis \
-  --enable-libvpx \
-  --enable-libx264 \
-  --enable-libx265 \
-  --enable-nonfree
-PATH="$HOME/bin:$PATH" make
-make install
-hash -r
+	cd ~/ffmpeg_sources
+	git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git
+	cd libvpx
+	PATH="$HOME/bin:$PATH" ./configure --prefix="$HOME/ffmpeg_build" --disable-examples --disable-unit-tests --enable-vp9-highbitdepth
+	PATH="$HOME/bin:$PATH" make
+	make install
+
+	cd ~/ffmpeg_sources
+	wget http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2
+	tar xjvf ffmpeg-snapshot.tar.bz2
+	cd ffmpeg
+	PATH="$HOME/bin:$PATH" PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" ./configure \
+	  --prefix="$HOME/ffmpeg_build" \
+	  --pkg-config-flags="--static" \
+	  --extra-cflags="-I$HOME/ffmpeg_build/include" \
+	  --extra-ldflags="-L$HOME/ffmpeg_build/lib" \
+	  --bindir="$HOME/bin" \
+	  --enable-gpl \
+	  --enable-libass \
+	  --enable-libfdk-aac \
+	  --enable-libfreetype \
+	  --enable-libmp3lame \
+	  --enable-libopus \
+	  --enable-libtheora \
+	  --enable-libvorbis \
+	  --enable-libvpx \
+	  --enable-libx264 \
+	  --enable-libx265 \
+	  --enable-nonfree
+	PATH="$HOME/bin:$PATH" make
+	make install
+	hash -r
 	
 5 - Check for errors and test your ffmpeg install.  Ensure you are compliant from a license perspective.
 	https://www.ffmpeg.org/legal.html
@@ -211,41 +212,74 @@ hash -r
 	
 6 - Setup for memreas transcoder
 
-cd /var/www
-#create a user for Apache to allow you to su to this user
-sudo adduser memreas
+	cd /var/www
+	#create a user for Apache to allow you to su to this user
+	sudo adduser memreas
 
-#add this user to www-data
-sudo usermod -aG www-data memreas
+	#add this user to www-data
+	sudo usermod -aG www-data memreas
 
-#change the run user of Apache - this user will need to execute ffmpeg
-sudo vi /etc/apache2/envvars
+	#change the run user of Apache - this user will need to execute ffmpeg
+	sudo vi /etc/apache2/envvars
 
-#make the change as below
-#export APACHE_RUN_USER=www-data
-export APACHE_RUN_USER=memreas
+	#make the change as below
+	#export APACHE_RUN_USER=www-data
+	export APACHE_RUN_USER=memreas
 
-#change ownership of www to memreas:www-data
-sudo chown -R memreas:www-data www
+	#change ownership of www to memreas:www-data
+	sudo chown -R memreas:www-data www
 
-#now change to memreas 
-sudo su memreas
+	#now change to memreas 
+	sudo su memreas
 
-#create the work directory and ffmpeg directories
-cd /var/www
-mkdir ephemeral0
-mkdir memreas_ffmpeg_install
+	#create the work directory and ffmpeg directories
+	cd /var/www
+	mkdir ephemeral0
+	mkdir memreas_ffmpeg_install
 
-#copy bin to memreas_ffmpeg_install
-#note check ffmpeg_build/bin to ensure all binaries are copied
-cp /home/ubuntu/bin/* /var/www/memreas_ffmpeg_install/bin/*
-cp /home/ubuntu/ffmpeg_build/bin/* /var/www/memreas_ffmpeg_install/bin/*
+	#copy bin to memreas_ffmpeg_install
+	#note check ffmpeg_build/bin to ensure all binaries are copied
+	cp /home/ubuntu/bin/* /var/www/memreas_ffmpeg_install/bin/*
+	cp /home/ubuntu/ffmpeg_build/bin/* /var/www/memreas_ffmpeg_install/bin/*
 
-# set ownership and permissions
-sudo chown -R memreas:www-data /var/www
-chmod -R 755 /var/www/memreas_ffmpeg_install
-chmod -R 755 /var/www/ephemeral0
+	# set ownership and permissions
+	chown -R memreas:www-data /var/www/memreas_ffmpeg_install/bin
+	chmod -R 755 /var/www/memreas_ffmpeg_install
+	chmod -R 755 /var/www/ephemeral0
 
+	#Deploy code to server
+	#Note: git pull is built in and setup is shown here
+	#Setup an ssh key for your repo as memreas user
+	https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
 
+	cd ~
+	ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+	eval "$(ssh-agent -s)"
+	ssh-add ~/.ssh/id_rsa
+
+	#add the ssh key to your github account...
+	https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/
+	cat /home/memreas/.ssh/id_rsa.pub
+
+	#now you can clone the project
+	cd /var/www
+	git clone git@github.com:memreas/memreas-transcoder-public.git
+	
+	#next change the default docroot - exit back to ubuntu user
+	sudo vi /etc/apache2/sites-available/000-default.conf
+	#DocumentRoot /var/www/html
+    DocumentRoot /var/www/memreas-transcoder-public	
+
+	#alternatively you can setup a virtual host
+	https://www.digitalocean.com/community/tutorials/how-to-set-up-apache-virtual-hosts-on-ubuntu-16-04
+	
+	#return to docroot and build the php vendor folder
+	cd /var/www/memreas-transcoder-public
+	sudo su memreas
+	wget https://getcomposer.org/download/1.5.1/composer.phar
+	sudo apt-get install php5-curl
+	php composer.phar install
+	
+	
 
 

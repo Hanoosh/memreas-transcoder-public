@@ -10,10 +10,7 @@ nbproject
 .key
 .keyinfo
 .buildpath
-composer.phar
-composer.lock
 data/session/
 data/media/
 php_errors.log
 wakeup.log
-vendor/
