@@ -21,6 +21,7 @@ Caveats
 ------------
 - Security aspects shown here are for sample purposes.  Security and Server hardening are outside of the scope of this project.
 - Error logging messages are for debugging purposes only (e.g. Mlog)
+- Ubuntu shown as example.  Other Linux instances may be used.
 
 Installation
 ------------
@@ -45,8 +46,11 @@ Installation
 	
 	Install MySQL
 	sudo apt-get install mysql-server
+	*set root password
 	*create a user
 	https://www.digitalocean.com/community/tutorials/how-to-create-a-new-user-and-grant-permissions-in-mysql
+	mysql -u root -p
+		USE mysql;
 		CREATE USER 'memreas'@'localhost' IDENTIFIED BY 'memreas';
 		GRANT ALL PRIVILEGES ON * . * TO 'memreas'@'localhost';
 		GRANT ALL PRIVILEGES ON * . * TO 'memreas'@'localhost';
@@ -56,15 +60,31 @@ Installation
 	*create the transcode_transaction table from mysql_install_schema_table.sql
 	
 	
-	Install PHP
-	sudo apt-get install php libapache2-mod-php php-mcrypt php-mysql php5-curl
+	Install PHP (5.6)
+	https://askubuntu.com/questions/756181/installing-php-5-6-on-xenial-16-04
+	
+	sudo add-apt-repository ppa:ondrej/php
+	sudo apt-get install software-properties-common
+	sudo apt-get update
+	sudo apt-get install php5.6
+	sudo apt-get install php5.6-mbstring php5.6-mcrypt php5.6-mysql php5.6-xml php5.6-curl
+	#sudo apt-get install php libapache2-mod-php php-mcrypt php-mysql php5-curl
 	sudo nano /etc/apache2/mods-enabled/dir.conf
-	...
+	#move index.php to front 
+		<IfModule mod_dir.c>
+        	DirectoryIndex index.php index.html index.cgi index.pl index.xhtml index.htm
+		</IfModule>
 	sudo systemctl restart apache2
 	sudo systemctl status apache2
-	
+	#ctrl-c to exit
+	#test php for apache
+	sudo nano /var/www/html/info.php
+		<?php
+			phpinfo();
+		?>
+	#save and check http://YOUR_IP/info.php
 
-3 - Install Redis
+3 - Install Redis (another instance may be used for Redis if you plan to auto-scale)
 	https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04
 	sudo apt-get update
 	sudo apt-get install build-essential tcl
@@ -78,20 +98,31 @@ Installation
 	sudo mkdir /etc/redis
 	sudo cp /tmp/redis-stable/redis.conf /etc/redis
 	sudo nano /etc/redis/redis.conf
-	...
+		supervised systemd
 	sudo nano /etc/systemd/system/redis.service
-	...
+		[Unit]
+		Description=Redis In-Memory Data Store
+		After=network.target
+
+		[Service]
+		User=redis
+		Group=redis
+		ExecStart=/usr/local/bin/redis-server /etc/redis/redis.conf
+		ExecStop=/usr/local/bin/redis-cli shutdown
+		Restart=always
+
+		[Install]
+		WantedBy=multi-user.target
 	sudo adduser --system --group --no-create-home redis
 	sudo mkdir /var/lib/redis
 	sudo chown redis:redis /var/lib/redis
 	sudo chmod 770 /var/lib/redis
 	sudo systemctl start redis
 	sudo systemctl status redis
-	*test redis
 	redis-cli
-	ping 
-	*redis should be installed and return PONG
-	*cleanup /tmp
+		ping
+		quit 
+	#cleanup /tmp
 	sudo rm -rf /tmp/redis-stable.tar.gz 
 	sudo rm -rf /tmp/redis-stable
 	
@@ -172,12 +203,12 @@ Installation
 
 	sudo apt-get install libvpx-dev
 	sudo apt-get install git
-
 	cd ~/ffmpeg_sources
 	git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git
 	cd libvpx
 	PATH="$HOME/bin:$PATH" ./configure --prefix="$HOME/ffmpeg_build" --disable-examples --disable-unit-tests --enable-vp9-highbitdepth
-	PATH="$HOME/bin:$PATH" make
+	PATH="$HOME/bin:$PATH" 
+	make
 	make install
 
 	cd ~/ffmpeg_sources
@@ -207,10 +238,11 @@ Installation
 	hash -r
 	
 5 - Check for errors and test your ffmpeg install.  Ensure you are compliant from a license perspective.
+	https://ffmpeg.org/ffmpeg.html
 	https://www.ffmpeg.org/legal.html
 	ffmpeg and ffprobe should work from the command line
 	
-6 - Setup for memreas transcoder
+6 - Setup for memreas transcoder site
 
 	cd /var/www
 	#create a user for Apache to allow you to su to this user
@@ -227,27 +259,52 @@ Installation
 	export APACHE_RUN_USER=memreas
 
 	#change ownership of www to memreas:www-data
+	cd /var
 	sudo chown -R memreas:www-data www
 
 	#now change to memreas 
+	cd /var/www
 	sudo su memreas
 
 	#create the work directory and ffmpeg directories
-	cd /var/www
 	mkdir ephemeral0
 	mkdir memreas_ffmpeg_install
 
 	#copy bin to memreas_ffmpeg_install
 	#note check ffmpeg_build/bin to ensure all binaries are copied
-	cp /home/ubuntu/bin/* /var/www/memreas_ffmpeg_install/bin/*
-	cp /home/ubuntu/ffmpeg_build/bin/* /var/www/memreas_ffmpeg_install/bin/*
+	cp -R /home/ubuntu/bin /var/www/memreas_ffmpeg_install/bin
+	cp /home/ubuntu/ffmpeg_build/bin/* /var/www/memreas_ffmpeg_install/bin
 
 	# set ownership and permissions
 	chown -R memreas:www-data /var/www/memreas_ffmpeg_install/bin
 	chmod -R 755 /var/www/memreas_ffmpeg_install
 	chmod -R 755 /var/www/ephemeral0
 
-	#Deploy code to server
+	#use git to clone the project - 
+	#now you can clone the project
+	cd /var/www
+	git clone git@github.com:memreas/memreas-transcoder-public.git
+	
+	#next change the default docroot and enable mod_rewrite - exit back to ubuntu user
+	sudo vi /etc/apache2/sites-available/000-default.conf
+	
+	 #DocumentRoot /var/www/html
+     DocumentRoot /var/www/memreas-transcoder-public/app
+
+        <Directory /var/www/memreas-transcoder-public>
+            Options Indexes FollowSymLinks MultiViews
+            AllowOverride All
+            Require all granted
+        </Directory>
+
+    sudo a2enmod rewrite
+    sudo systemctl restart apache2
+
+	#alternatively you can setup a virtual host
+	https://www.digitalocean.com/community/tutorials/how-to-set-up-apache-virtual-hosts-on-ubuntu-16-04
+	
+	
+	#Optional - use built in deploy Deploy code to server
 	#Note: git pull is built in and setup is shown here
 	#Setup an ssh key for your repo as memreas user
 	https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
@@ -261,25 +318,6 @@ Installation
 	https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/
 	cat /home/memreas/.ssh/id_rsa.pub
 
-	#now you can clone the project
-	cd /var/www
-	git clone git@github.com:memreas/memreas-transcoder-public.git
-	
-	#next change the default docroot - exit back to ubuntu user
-	sudo vi /etc/apache2/sites-available/000-default.conf
-	#DocumentRoot /var/www/html
-    DocumentRoot /var/www/memreas-transcoder-public	
 
-	#alternatively you can setup a virtual host
-	https://www.digitalocean.com/community/tutorials/how-to-set-up-apache-virtual-hosts-on-ubuntu-16-04
-	
-	#return to docroot and build the php vendor folder
-	cd /var/www/memreas-transcoder-public
-	sudo su memreas
-	wget https://getcomposer.org/download/1.5.1/composer.phar
-	sudo apt-get install php5-curl
-	php composer.phar install
-	
-	
 
 
