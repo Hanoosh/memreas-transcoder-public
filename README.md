@@ -3,11 +3,19 @@ memreas-transcoder-public
 
 Introduction
 ------------
-memreas transcoder is a php web based application the uses ffmpeg to transcode video and image formats.  For video input files such as (.avi, .mp4, etc.) can be transcoded to mp4, vp9 (webm), and hls including 4k support for Apple, GoPro, and standard 4k videos.
+memreas transcoder is a php web based application the uses ffmpeg to transcode video and image formats.  Video input files such as (.avi, .mp4, etc.) can be transcoded to mp4, vp9 (webm), and hls including 4k support for Apple, GoPro, and standard 4k videos. Images can be resized and stored as needed.
 
 The transcoder is built to use Amazon Web Services (AWS) as it's backend but can be port to other Cloud based services based on your needs.
 
-The transcoder is also equipped to handle auto-scaling and will process input video files sequentially based on a priority system in a single threaded fashion.  Images are processed even if the transcoder is processing a video so as not to create a backlog
+The transcoder works as such
+
+1 - Video or image should be already stored in S3 Bucket
+2 - Web request is made with appropriate parameters
+3 - For videos the transcoder will work on transcoding a single video at a time but will also allow for images to be resized
+4 - Upon completion the transcoder will store your transcoded video or images to your S3 bucket
+5 - Optional: In the event auto-scaling is setup a new server will be deployed as needed based on your requirements
+
+The transcoder is also equipped to handle auto-scaling and will process input video files sequentially based on a priority system in a single threaded fashion.  Images are processed even if the transcoder is processing a video so as not to create a backlog for smaller files.
 
 Requirements
 ------------
@@ -25,64 +33,89 @@ Caveats
 
 Installation
 ------------
+
+#High Level Steps
+
+1 - Launch Ubuntu instance 
+2 - ssh into your new instance
+3 - Install Apache, PHP, MySQL, and Redis
+4 - Install FFmpeg
+5 - Clone project and configure
+6 - Test
+
+#Low Level 
+
+
 1 - Launch Ubuntu instance - hardware sizing is dependent on your requirements
 	Add security access for http for 0.0.0.0 *for testing install only
 	Allow instance to be created with public IP
 2 - ssh into new instance
 	ssh -i PATH_TO_YOUR_PEM.pem ubuntu@EC2_PUBLIC_IP
 3 - Install Apache, PHP, MySQL
+
+
+https://www.digitalocean.com/community/tutorials/how-to-install-linux-apache-mysql-php-lamp-stack-on-ubuntu-16-04
+
+
+Apache
+```
+sudo apt-get update
+sudo apt-get install apache2
+sudo apache2ctl configtest
+sudo nano /etc/apache2/apache2.conf
+_add servername directive_
+```
+
 	
-	https://www.digitalocean.com/community/tutorials/how-to-install-linux-apache-mysql-php-lamp-stack-on-ubuntu-16-04
+Youshould be able to access http://YOUR_IP_ADDRESS and see the default ubuntu apache page
+Note: you can skip firewall section and use AWS security
+
+Install MySQL
+```
+sudo apt-get install mysql-server
+//set root password
+```
+
+Create a user
+https://www.digitalocean.com/community/tutorials/how-to-create-a-new-user-and-grant-permissions-in-mysql
+
+```
+mysql -u root -p
+
+USE mysql;
+CREATE USER 'memreas'@'localhost' IDENTIFIED BY 'memreas';
+GRANT ALL PRIVILEGES ON * . * TO 'memreas'@'localhost';
+GRANT ALL PRIVILEGES ON * . * TO 'memreas'@'localhost';
+CREATE SCHEMA transcoder;
+USE transcoder;
 	
-	Apache
-	sudo apt-get update
-	sudo apt-get install apache2
-	sudo apache2ctl configtest
-	sudo nano /etc/apache2/apache2.conf
-	*add servername directive
-	
-	Youshould be able to access http://YOUR_IP_ADDRESS and see the default ubuntu apache page
-	*you can skip firewall section given AWS security
-	
-	Install MySQL
-	sudo apt-get install mysql-server
-	*set root password
-	*create a user
-	https://www.digitalocean.com/community/tutorials/how-to-create-a-new-user-and-grant-permissions-in-mysql
-	mysql -u root -p
-		USE mysql;
-		CREATE USER 'memreas'@'localhost' IDENTIFIED BY 'memreas';
-		GRANT ALL PRIVILEGES ON * . * TO 'memreas'@'localhost';
-		GRANT ALL PRIVILEGES ON * . * TO 'memreas'@'localhost';
-		CREATE SCHEMA transcoder;
-		USE transcoder;
-		
-	*create the transcode_transaction table from mysql_install_schema_table.sql
-	
-	
-	Install PHP (5.6)
-	https://askubuntu.com/questions/756181/installing-php-5-6-on-xenial-16-04
-	
-	sudo add-apt-repository ppa:ondrej/php
-	sudo apt-get install software-properties-common
-	sudo apt-get update
-	sudo apt-get install php5.6
-	sudo apt-get install php5.6-mbstring php5.6-mcrypt php5.6-mysql php5.6-xml php5.6-curl
-	#sudo apt-get install php libapache2-mod-php php-mcrypt php-mysql php5-curl
-	sudo nano /etc/apache2/mods-enabled/dir.conf
-	#move index.php to front 
-		<IfModule mod_dir.c>
-        	DirectoryIndex index.php index.html index.cgi index.pl index.xhtml index.htm
-		</IfModule>
-	sudo systemctl restart apache2
-	sudo systemctl status apache2
-	#ctrl-c to exit
-	#test php for apache
-	sudo nano /var/www/html/info.php
-		<?php
-			phpinfo();
-		?>
-	#save and check http://YOUR_IP/info.php
+//create the transcode_transaction table from mysql_install_schema_table.sql
+```
+
+Install PHP (5.6)
+https://askubuntu.com/questions/756181/installing-php-5-6-on-xenial-16-04
+
+```
+sudo add-apt-repository ppa:ondrej/php
+sudo apt-get install software-properties-common
+sudo apt-get update
+sudo apt-get install php5.6
+sudo apt-get install php5.6-mbstring php5.6-mcrypt php5.6-mysql php5.6-xml php5.6-curl
+sudo nano /etc/apache2/mods-enabled/dir.conf
+//move index.php to front 
+	<IfModule mod_dir.c>
+    	DirectoryIndex index.php index.html index.cgi index.pl index.xhtml index.htm
+	</IfModule>
+sudo systemctl restart apache2
+sudo systemctl status apache2
+//ctrl-c to exit
+//test php for apache
+sudo nano /var/www/html/info.php
+	<?php
+		phpinfo();
+	?>
+//save and check http://YOUR_IP/info.php
+```
 
 3 - Install Redis (another instance may be used for Redis if you plan to auto-scale)
 
