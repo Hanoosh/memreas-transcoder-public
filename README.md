@@ -63,7 +63,7 @@ sudo apt-get update
 sudo apt-get install apache2
 sudo apache2ctl configtest
 sudo nano /etc/apache2/apache2.conf
-_add servername directive_
+//add servername directive
 ```
 
 	
@@ -157,7 +157,7 @@ sudo systemctl status redis
 redis-cli
 	ping
 	quit 
-#cleanup /tmp
+//cleanup /tmp
 sudo rm -rf /tmp/redis-stable.tar.gz 
 sudo rm -rf /tmp/redis-stable
 ```	
