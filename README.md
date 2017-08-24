@@ -284,68 +284,63 @@ hash -r
 
 ```
 cd /var/www
-#create a user for Apache to allow you to su to this user
+//create a user for Apache to allow you to su to this user
 sudo adduser memreas
 
-#add this user to www-data
+//add this user to www-data
 sudo usermod -aG www-data memreas
 
-#change the run user of Apache - this user will need to execute ffmpeg
+//change the run user of Apache - this user will need to execute ffmpeg
 sudo vi /etc/apache2/envvars
+	//make the change as below
+	export APACHE_RUN_USER=memreas
 
-#make the change as below
-#export APACHE_RUN_USER=www-data
-export APACHE_RUN_USER=memreas
-
-#change ownership of www to memreas:www-data
+//change ownership of www to memreas:www-data
 cd /var
 sudo chown -R memreas:www-data www
 
-#now change to memreas 
+//now change to memreas 
 cd /var/www
 sudo su memreas
 
-#create the work directory and ffmpeg directories
+//create the work directory and ffmpeg directories
 mkdir ephemeral0
 mkdir memreas_ffmpeg_install
 
-#copy bin to memreas_ffmpeg_install
-#note check ffmpeg_build/bin to ensure all binaries are copied
+//copy bin to memreas_ffmpeg_install
+//note check ffmpeg_build/bin to ensure all binaries are copied
 cp -R /home/ubuntu/bin /var/www/memreas_ffmpeg_install/bin
 cp /home/ubuntu/ffmpeg_build/bin/* /var/www/memreas_ffmpeg_install/bin
 
-# set ownership and permissions
+// set ownership and permissions
 chown -R memreas:www-data /var/www/memreas_ffmpeg_install/bin
 chmod -R 755 /var/www/memreas_ffmpeg_install
 chmod -R 755 /var/www/ephemeral0
 
-#use git to clone the project - 
-#now you can clone the project
+//use git to clone the project 
 cd /var/www
 git clone git@github.com:memreas/memreas-transcoder-public.git
 
-#next change the default docroot and enable mod_rewrite - exit back to ubuntu user
+//next change the default docroot and enable mod_rewrite - exit back to ubuntu user
 sudo vi /etc/apache2/sites-available/000-default.conf
+	//change docroot per below
+	DocumentRoot /var/www/memreas-transcoder-public/app
+	    <Directory /var/www/memreas-transcoder-public>
+	        Options Indexes FollowSymLinks MultiViews
+	        AllowOverride All
+	        Require all granted
+	    </Directory>
 
- #DocumentRoot /var/www/html
- DocumentRoot /var/www/memreas-transcoder-public/app
+//alternatively you can setup a virtual host
+https://www.digitalocean.com/community/tutorials/how-to-set-up-apache-virtual-hosts-on-ubuntu-16-04
 
-    <Directory /var/www/memreas-transcoder-public>
-        Options Indexes FollowSymLinks MultiViews
-        AllowOverride All
-        Require all granted
-    </Directory>
-
+//next enable mod_rewrite for .htaccess
 sudo a2enmod rewrite
 sudo systemctl restart apache2
 
-#alternatively you can setup a virtual host
-https://www.digitalocean.com/community/tutorials/how-to-set-up-apache-virtual-hosts-on-ubuntu-16-04
-
-
-#Optional - use built in deploy Deploy code to server
-#Note: git pull is built in and setup is shown here
-#Setup an ssh key for your repo as memreas user
+//Optional - use built in deploy Deploy code to server
+//Note: git pull is built in and setup is shown here
+//Setup an ssh key for your repo as memreas user
 https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
 
 cd ~
