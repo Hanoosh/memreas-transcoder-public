@@ -350,6 +350,7 @@ sudo systemctl restart apache2
 
 //alternatively you can setup a virtual host
 https://www.digitalocean.com/community/tutorials/how-to-set-up-apache-virtual-hosts-on-ubuntu-16-04
+```
 
 //next create a local.php for your db connection - for auto-scaling MySQL should be a separate server
 ```
@@ -516,5 +517,4 @@ sudo vi /etc/rc.local
 //
 // Server should be setup and ready to test
 // - reboot the server and check the php_errors.log file to see check for errors
-// - add startup_worker.sh to rc.local
 //
