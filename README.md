@@ -245,50 +245,48 @@ Installation
 6 - Setup for memreas transcoder site
 
 	cd /var/www
-	#create a user for Apache to allow you to su to this user
+	//create a user for Apache to allow you to su to this user
 	sudo adduser memreas
 
-	#add this user to www-data
-	sudo usermod -aG www-data memreas
+	//add this user to www-data
+	sudo usermod -ag www-data memreas
 
-	#change the run user of Apache - this user will need to execute ffmpeg
+	//change the run user of Apache - this user will need to execute ffmpeg
 	sudo vi /etc/apache2/envvars
 
-	#make the change as below
-	#export APACHE_RUN_USER=www-data
+	//make the change as below
 	export APACHE_RUN_USER=memreas
 
-	#change ownership of www to memreas:www-data
+	//change ownership of www to memreas:www-data
 	cd /var
 	sudo chown -R memreas:www-data www
 
-	#now change to memreas 
+	//now change to memreas 
 	cd /var/www
 	sudo su memreas
 
-	#create the work directory and ffmpeg directories
+	//create the work directory and ffmpeg directories
 	mkdir ephemeral0
 	mkdir memreas_ffmpeg_install
 
-	#copy bin to memreas_ffmpeg_install
-	#note check ffmpeg_build/bin to ensure all binaries are copied
+	//copy bin to memreas_ffmpeg_install
+	//note check ffmpeg_build/bin to ensure all binaries are copied
 	cp -R /home/ubuntu/bin /var/www/memreas_ffmpeg_install/bin
 	cp /home/ubuntu/ffmpeg_build/bin/* /var/www/memreas_ffmpeg_install/bin
 
-	# set ownership and permissions
+	//set ownership and permissions
 	chown -R memreas:www-data /var/www/memreas_ffmpeg_install/bin
 	chmod -R 755 /var/www/memreas_ffmpeg_install
 	chmod -R 755 /var/www/ephemeral0
 
-	#use git to clone the project - 
-	#now you can clone the project
+	//use git to clone the project - 
+	//now you can clone the project
 	cd /var/www
 	git clone git@github.com:memreas/memreas-transcoder-public.git
 	
-	#next change the default docroot and enable mod_rewrite - exit back to ubuntu user
+	//next change the default docroot and enable mod_rewrite - exit back to ubuntu user
 	sudo vi /etc/apache2/sites-available/000-default.conf
 	
-	 #DocumentRoot /var/www/html
      DocumentRoot /var/www/memreas-transcoder-public/app
 
         <Directory /var/www/memreas-transcoder-public>
@@ -299,14 +297,83 @@ Installation
 
     sudo a2enmod rewrite
     sudo systemctl restart apache2
+    //check http://YOUR_IP/info.php 
 
-	#alternatively you can setup a virtual host
+	//alternatively you can setup a virtual host
 	https://www.digitalocean.com/community/tutorials/how-to-set-up-apache-virtual-hosts-on-ubuntu-16-04
 	
+    //next create a local.php for your db connection - for auto-scaling MySQL should be a separate server
+		<?php
+		/**
+		 * Local Configuration Override
+		 *
+		 * This configuration override file is for overriding environment-specific and
+		 * security-sensitive configuration information. Copy this file without the
+		 * .dist extension at the end and populate values as needed.
+		 *
+		 * @NOTE: This file is ignored from Git by default with the .gitignore included
+		 * in ZendSkeletonApplication. This is a good practice, as it prevents sensitive
+		 * credentials from accidentally being committed into version control.
+		 */
+ 
+		return array (
+				// Whether or not to enable a configuration cache.
+				// If enabled, the merged configuration will be cached and used in
+				// subsequent requests.
+				// 'config_cache_enabled' => false,
+				// The key used to create the configuration cache file name.
+				// 'config_cache_key' => 'module_config_cache',
+				// The path in which to cache merged configuration.
+				// 'cache_dir' => './data/cache',
+				// ...
+		
+				'db' => array (
+						'adapters' => array (
+								'YOUR_DB_NAME' => array (
+										'dsn' => 'mysql:dbname=YOUR_DB_NAME;host=YOUR_DB_HOSTNAME',
+										'username' => 'YOUR_DB_USER',
+										'password' => 'YOUR_DB_PASSWORD 
+								)
+						) 
+				),
+		
+				'doctrine' => array (
+						'connection' => array (
+								'orm_default' => array (
+										'doctrine_type_mappings' => array (
+												'enum' => 'string',
+												'bit' => 'string' 
+										),
+										// memreasbackenddb
+										'driverClass' => 'Doctrine\DBAL\Driver\PDOMySql\Driver',
+										'params' => array (
+												'host' => 'YOUR_DB_HOSTNAME',
+												'port' => '3306',
+												'dbname' => 'YOUR_DB_NAME',
+												'user' => 'YOUR_DB_USER',
+												'password' => 'YOUR_DB_PASSWORD' 
+										) 
+								) 
+						) 
+				) 
+		);
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    #then update memreasconstants.php for your aws keys **this can be modified per AWS key security guidelines
+    
+
 	
-	#Optional - use built in deploy Deploy code to server
-	#Note: git pull is built in and setup is shown here
-	#Setup an ssh key for your repo as memreas user
+	//Optional - use built in deploy Deploy code to server
+	//Note: git pull is built in and setup is shown here
+	//Setup an ssh key for your repo as memreas user
 	https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
 
 	cd ~
@@ -314,7 +381,7 @@ Installation
 	eval "$(ssh-agent -s)"
 	ssh-add ~/.ssh/id_rsa
 
-	#add the ssh key to your github account...
+	//add the ssh key to your github account...
 	https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/
 	cat /home/memreas/.ssh/id_rsa.pub
 

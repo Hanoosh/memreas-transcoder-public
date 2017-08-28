@@ -1,6 +1,5 @@
 #!/bin/bash
-#Purpose = startup ffmpeg processing worker
-#Created on 30-DEC-2015
+#Purpose = pull latest code for ffmpeg processing worker and start processing...
 
 # Define a timestamp function
 timestamp() {
@@ -48,3 +47,4 @@ while [  $WAIT == true ]; do
 done
 echo -e "$(timestamp) startup_worker.sh complete!\n" >> $OUTPUTFILE 
 
+exit 0
