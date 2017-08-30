@@ -27,7 +27,7 @@ Requirements
 - Redis installation: used to manage multiple workers
 
 Caveats
-------------
+-------
 - Security aspects shown here are for sample purposes.  Security and Server hardening are outside of the scope of this project.
 - Error logging messages are for debugging purposes only (e.g. Mlog)
 - Ubuntu shown as example.  Other Linux instances may be used.
@@ -90,10 +90,10 @@ CREATE SCHEMA transcoder;
 USE transcoder;
 	
 //create the transcode_transaction table from mysql_install_schema_table.sql
-```
 //
 // Update AWS permissions
 // - MySQL Server - allow access from transcoder
+```
 
 
 
