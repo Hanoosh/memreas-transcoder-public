@@ -35,28 +35,27 @@ Caveats
 Installation
 ------------
 
-#High Level Steps
+High Level Steps
+----------------
 
-1 - Launch Ubuntu instance 
-2 - ssh into your new instance
-3 - Install Apache, PHP, MySQL, and Redis
-4 - Install FFmpeg
-5 - Clone project and configure
-6 - Test
+1 - Launch Ubuntu instance <br>
+2 - ssh into your new instance<br>
+3 - Install Apache, PHP, MySQL, and Redis<br>
+4 - Install FFmpeg<br>
+5 - Clone project and configure<br>
+6 - Test<br>
 
-#Low Level 
+Low Level 
+---------
 
-
-1 - Launch Ubuntu instance - hardware sizing is dependent on your requirements
-	Add security access for http for 0.0.0.0 *for testing install only
-	Allow instance to be created with public IP
-2 - ssh into new instance
-	ssh -i PATH_TO_YOUR_PEM.pem ubuntu@EC2_PUBLIC_IP
-3 - Install Apache, PHP, MySQL
-
+1 - Launch Ubuntu instance - hardware sizing is dependent on your requirements<br>
+	Add security access for http for 0.0.0.0 *for testing install only<br>
+	Allow instance to be created with public IP<br>
+2 - ssh into new instance<br>
+	ssh -i PATH_TO_YOUR_PEM.pem ubuntu@EC2_PUBLIC_IP<br>
+3 - Install Apache, PHP, MySQL<br>
 
 https://www.digitalocean.com/community/tutorials/how-to-install-linux-apache-mysql-php-lamp-stack-on-ubuntu-16-04
-
 
 Apache
 ```
