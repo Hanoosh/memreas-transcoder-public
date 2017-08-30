@@ -9,11 +9,12 @@ The transcoder is built to use Amazon Web Services (AWS) as it's backend but can
 
 The transcoder works as such
 
-1 - Video or image should be already stored in your S3 Bucket
-2 - Web request is made with appropriate parameters
-3 - For videos the transcoder will work on transcoding a single video at a time but will also allow for images to be resized
-4 - Upon completion the transcoder will store your transcoded video or images to your S3 bucket
-5 - Optional: In the event auto-scaling is setup a new server will be deployed as needed based on your requirements
+1 - Video or image should be already stored in your S3 Bucket <br>
+2 - Web request is made with appropriate parameters <br>
+3 - For videos the transcoder will work on transcoding a single video at a time but will also allow for images to be resized <br>
+4 - Upon completion the transcoder will store your transcoded video or images to your S3 bucket <br>
+5 - Optional: In the event auto-scaling is setup a new server will be deployed as needed based on your requirements <br>
+<br>
 
 The transcoder is also equipped to handle auto-scaling and will process input video files sequentially based on a priority system in a single threaded fashion.  Images are processed even if the transcoder is processing a video so as not to create a backlog for smaller files.
 
@@ -524,6 +525,6 @@ sudo vi /etc/rc.local
 
 //
 // Server should be setup and ready to test
-// - reboot the server and edit the test_transcoder.sh to test
+// - reboot the server and edit/execute the test_transcoder.sh to test
 // - you can use tpel.sh to tail the php_errors.log file
 //
