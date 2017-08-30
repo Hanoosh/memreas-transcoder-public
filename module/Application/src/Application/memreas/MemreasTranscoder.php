@@ -856,7 +856,7 @@ class MemreasTranscoder {
 				
 				// Push m3u8 file
 				$s3file = $this->s3prefixpath . $this->type . '/' . $this->MediaFileName . '.m3u8';
-				$this->aws_manager_receiver->pushMediaToS3 ( $transcoded_file, $s3file, "application/x-mpegurl", true, MemreasConstants::S3HLSBUCKET, true );
+				$this->aws_manager_receiver->pushMediaToS3 ( $transcoded_file, $s3file, "application/x-mpegurl", true, MemreasConstants::S3BUCKET, true );
 				
 				// Push all .ts files
 				$pat = $this->homeDir . self::CONVDIR . self::HLSDIR . $this->MediaFileName . "*.ts";
@@ -865,7 +865,7 @@ class MemreasTranscoder {
 				foreach ( glob ( $pat ) as $filename ) {
 					$fsize += filesize ( $filename );
 					$s3tsfile = $this->s3prefixpath . $this->type . '/' . basename ( $filename );
-					$this->aws_manager_receiver->pushMediaToS3 ( $filename, $s3tsfile, "video/mp2t", true, MemreasConstants::S3HLSBUCKET, true );
+					$this->aws_manager_receiver->pushMediaToS3 ( $filename, $s3tsfile, "video/mp2t", true, MemreasConstants::S3BUCKET, true );
 				}
 			} else if ($this->type == "webm") {
 				$this->aws_manager_receiver->pushMediaToS3 ( $transcoded_file, $s3file, "video/webm", true );
