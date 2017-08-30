@@ -24,12 +24,5 @@ class MemreasTranscoderTables {
 		return $this->transcodeTransactionTable;
 	}
 	
-	// Media table
-	public function getMediaTable() {
-		if (! $this->mediaTable) {
-			$this->mediaTable = $this->service_locator->get ( 'Application\Model\MediaTable' );
-		}
-		return $this->mediaTable;
-	}
 }
 ?>

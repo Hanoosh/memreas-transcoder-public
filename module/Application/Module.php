@@ -155,67 +155,6 @@ class Module {
 						
 						// Database Tables...
 						// memreas base tables
-						'Application\Model\UserTable' => function ($sm) {
-							$tableGateway = $sm->get ( 'UserTableGateway' );
-							$table = new UserTable ( $tableGateway );
-							return $table;
-						},
-						'UserTableGateway' => function ($sm) {
-							$dbAdapter = $sm->get ( MemreasConstants::MEMREASDB );
-							$resultSetPrototype = new \Zend\Db\ResultSet\ResultSet ();
-							$resultSetPrototype->setArrayObjectPrototype ( new User () );
-							return new TableGateway ( 'user', $dbAdapter, null, $resultSetPrototype );
-						},
-						'Application\Model\MediaTable' => function ($sm) {
-							$tableGateway = $sm->get ( 'MediaTableGateway' );
-							$table = new Model\MediaTable ( $tableGateway );
-							return $table;
-						},
-						'MediaTableGateway' => function ($sm) {
-							$dbAdapter = $sm->get ( MemreasConstants::MEMREASDB );
-							$resultSetPrototype = new \Zend\Db\ResultSet\ResultSet ();
-							$resultSetPrototype->setArrayObjectPrototype ( new Model\Media () );
-							return new TableGateway ( 'media', $dbAdapter, null, $resultSetPrototype );
-						},
-						'Application\Model\EventTable' => function ($sm) {
-							$tableGateway = $sm->get ( 'EventTableGateway' );
-							$table = new Model\EventTable ( $tableGateway );
-							return $table;
-						},
-						'EventTableGateway' => function ($sm) {
-							$dbAdapter = $sm->get ( MemreasConstants::MEMREASDB );
-							$resultSetPrototype = new \Zend\Db\ResultSet\ResultSet ();
-							$resultSetPrototype->setArrayObjectPrototype ( new Model\Event () );
-							return new TableGateway ( 'event', $dbAdapter, null, $resultSetPrototype );
-						},
-						'Application\Model\EventMediaTable' => function ($sm) {
-							$tableGateway = $sm->get ( 'EventMediaTableGateway' );
-							$table = new Model\EventMediaTable ( $tableGateway );
-							return $table;
-						},
-						'EventMediaTableGateway' => function ($sm) {
-							$dbAdapter = $sm->get ( MemreasConstants::MEMREASDB );
-							$resultSetPrototype = new \Zend\Db\ResultSet\ResultSet ();
-							$resultSetPrototype->setArrayObjectPrototype ( new Model\EventMedia () );
-							return new TableGateway ( 'event_media', $dbAdapter, null, $resultSetPrototype );
-						},
-						'EventTableGateway' => function ($sm) {
-							$dbAdapter = $sm->get ( MemreasConstants::MEMREASDB );
-							$resultSetPrototype = new \Zend\Db\ResultSet\ResultSet ();
-							$resultSetPrototype->setArrayObjectPrototype ( new Model\Event () );
-							return new TableGateway ( 'event', $dbAdapter, null, $resultSetPrototype );
-						},
-						'Application\Model\FriendMediaTable' => function ($sm) {
-							$tableGateway = $sm->get ( 'FriendMediaTableGateway' );
-							$table = new Model\FriendMediaTable ( $tableGateway );
-							return $table;
-						},
-						'FriendMediaTableGateway' => function ($sm) {
-							$dbAdapter = $sm->get ( MemreasConstants::MEMREASDB );
-							$resultSetPrototype = new \Zend\Db\ResultSet\ResultSet ();
-							$resultSetPrototype->setArrayObjectPrototype ( new Model\FriendMedia () );
-							return new TableGateway ( 'friend_media', $dbAdapter, null, $resultSetPrototype );
-						},
 						// Transcode related tables
 						'Application\Model\TranscodeTransactionTable' => function ($sm) {
 							$tableGateway = $sm->get ( 'TranscodeTransactionTableGateway' );
@@ -223,7 +162,7 @@ class Module {
 							return $table;
 						},
 						'TranscodeTransactionTableGateway' => function ($sm) {
-							$dbAdapter = $sm->get ( MemreasConstants::MEMREASBEDB );
+						$dbAdapter = $sm->get ( MemreasConstants::TRANSCODERDB);
 							$resultSetPrototype = new ResultSet ();
 							$resultSetPrototype->setArrayObjectPrototype ( new TranscodeTransaction () );
 							return new TableGateway ( 'transcodetransaction', $dbAdapter, null, $resultSetPrototype );
