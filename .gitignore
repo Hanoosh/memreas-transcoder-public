@@ -14,3 +14,4 @@ data/session/
 data/media/
 php_errors.log
 wakeup.log
+MemreasConstants.php
