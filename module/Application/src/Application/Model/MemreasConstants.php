@@ -10,7 +10,6 @@ class MemreasConstants {
 	const AWS_APPREG = 'YOUR_AWS_REGION'; //i.e. us-east-1
 	const S3BUCKET = "YOUR_S3_BUCKET_NAME";
 	const S3HLSBUCKET = "YOUR_S3_BUCKET_NAME"; 
-	const CLOUDFRONT_HLSSTREAMING_HOST = 'YOUR_CLOUDFRONT_URL'; //optional
 
 	// MySQL section *for auto-scaling a separate Redis instance should be used
 	const TRANSCODERDB = 'YOUR_DB_NAME';

@@ -296,10 +296,10 @@ make install
 hash -r
 ```
 	
-5 - Check for errors and test your ffmpeg install.  Ensure you are compliant from a license perspective.
-	https://ffmpeg.org/ffmpeg.html
-	https://www.ffmpeg.org/legal.html
-	ffmpeg and ffprobe should work from the command line
+5 - Check for errors and test your ffmpeg install.  Ensure you are compliant from a license perspective.<br>
+	https://ffmpeg.org/ffmpeg.html<br>
+	https://www.ffmpeg.org/legal.html<br>
+	ffmpeg and ffprobe should work from the command line<br>
 	
 6 - Setup for memreas transcoder site
 
@@ -363,7 +363,7 @@ sudo systemctl restart apache2
 https://www.digitalocean.com/community/tutorials/how-to-set-up-apache-virtual-hosts-on-ubuntu-16-04
 ```
 
-//next create a local.php for your db connection - for auto-scaling MySQL should be a separate server
+Next create a local.php for your db connection - for auto-scaling MySQL should be a separate server
 ```
 <?php
 /**
@@ -389,10 +389,11 @@ return array (
 		// 'cache_dir' => './data/cache',
 		// ...
 
+		//
 		'db' => array (
 				'adapters' => array (
-						'YOUR_DB_NAME' => array (
-								'dsn' => 'mysql:dbname=YOUR_DB_NAME;host=YOUR_DB_HOSTNAME',
+						'transcoderdb' => array (
+								'dsn' => 'mysql:dbname=YOUR_SCHEMA_NAME;host=YOUR_DB_HOSTNAME',
 								'username' => 'YOUR_DB_USER',
 								'password' => 'YOUR_DB_PASSWORD 
 						)
@@ -406,12 +407,11 @@ return array (
 										'enum' => 'string',
 										'bit' => 'string' 
 								),
-								// memreasbackenddb
 								'driverClass' => 'Doctrine\DBAL\Driver\PDOMySql\Driver',
 								'params' => array (
 										'host' => 'YOUR_DB_HOSTNAME',
 										'port' => '3306',
-										'dbname' => 'YOUR_DB_NAME',
+										'dbname' => 'YOUR_SCHEMA_NAME',
 										'user' => 'YOUR_DB_USER',
 										'password' => 'YOUR_DB_PASSWORD' 
 								) 
@@ -421,10 +421,8 @@ return array (
 );
 ```
 
-//
-// Configure transcoder
-// - update memreasconstants.php for your AWS, Redis, and MySQL config data
-//
+Configure transcoder
+- update memreasconstants.php for your AWS, Redis, and MySQL config data
 
 ```
 <?php
@@ -439,10 +437,9 @@ class MemreasConstants {
 	const AWS_APPREG = 'YOUR_AWS_REGION'; //i.e. us-east-1
 	const S3BUCKET = "YOUR_S3_BUCKET_NAME";
 	const S3HLSBUCKET = "YOUR_S3_BUCKET_NAME"; 
-	const CLOUDFRONT_HLSSTREAMING_HOST = 'YOUR_CLOUDFRONT_URL'; //optional
 
 	// MySQL section *for auto-scaling a separate Redis instance should be used
-	const TRANSCODERDB = 'YOUR_DB_NAME';
+	const TRANSCODERDB = 'YOUR_SCHEMA_NAME'; //i.e. use transcoder;
 
 
 	// Redis section v3.0.7 *for auto-scaling a separate Redis instance should be used
@@ -493,13 +490,18 @@ class MemreasConstants {
 }
 ```
 
-//
-// Configure transcoder
-// - setup git
-//Optional - use built in deploy Deploy code to server
-//Note: git pull is built in and setup is shown here
 
-//Setup an ssh key for your repo as memreas user
+Configure transcoder for auto scaling *git repo is expected
+Note: git pull is built in and setup is shown here
+
+Auto-scaling works as such:
+- When set thresholds are met a new server is deployed from existing AMI
+- AMI will call startup_worker.sh 
+- startup_worker.sh will pull from git
+- startup_worker.sh will then fetch from database backlog and begin processing
+
+Git configuration *assumes you have setup your own repo at this point.
+Setup an ssh key for your repo as memreas user
 https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
 
 ```
@@ -524,8 +526,19 @@ sudo vi /etc/rc.local
 	/var/www/memreas-transcoder-public/startup_worker.sh
 ```
 
-//
-// Server should be setup and ready to test
-// - reboot the server and edit/execute the test_transcoder.sh to test
-// - you can use tpel.sh to tail the php_errors.log file
-//
+Server should be setup and ready to test
+- reboot the server and edit/execute the test_transcoder.sh to test
+- you can use tpel.sh to tail the php_errors.log file
+
+Create an AMI of this server once you're testing is complete
+
+For Auto-Scaling:
+- Create an Auto-Scaling Group
+- Create a new launch configuration
+- Use the AMI you just created as your base
+- *Hardware sizing is project specific so adjust your server accordingly
+- Create thesholds for scale down and scale up and ensure you set cooldown threshold
+- *A simple configuration is to use time with CPU Utilization for scale up and down (i.e. if >90% and > 5 minutes start new server, if <20% and >5 minutes then scale down with 1 server as minimum)
+
+Testing Auto-Scaling
+- You can test best using test_autoscaler.sh with large files and monitoring your EC2 instances.
