@@ -28,7 +28,6 @@ class AWSMemreasRedisCache {
 			// port is open and available
 			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__.'::', 'PORT 6379 IS OPEN' );
 			fclose($fp);
-			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__.'::', 'fclose($fp) success' );
 		}		
 		
 		if (! $this->isCacheEnable) {
@@ -44,7 +43,8 @@ class AWSMemreasRedisCache {
 			] );
 			self::$isInitialized = true;
 			self::$handle = $this;
-		//} catch ( \Predis\Connection\ConnectionException $ex ) {
+			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__.'::', 'PREDIS CLIENT INITIALIZED');
+			//} catch ( \Predis\Connection\ConnectionException $ex ) {
 		//	error_log ( "exception ---> " . print_r ( $ex, true ) . PHP_EOL );
 		} catch ( \Exception $ex ) {
 			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__.'::$ex-->', $ex);
