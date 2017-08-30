@@ -31,6 +31,7 @@ Caveats
 - Security aspects shown here are for sample purposes.  Security and Server hardening are outside of the scope of this project.
 - Error logging messages are for debugging purposes only (e.g. Mlog)
 - Ubuntu shown as example.  Other Linux instances may be used.
+- This is a time intensive install dependent on your level of experience.
 
 Installation
 ------------
