@@ -175,11 +175,13 @@ redis-cli
 //cleanup /tmp
 sudo rm -rf /tmp/redis-stable.tar.gz 
 sudo rm -rf /tmp/redis-stable
-```	
 
 //
 // Update AWS permissions
 // - Redis Server - allow access from transcoder
+
+```	
+
 	
 4 - Install ffmpeg
 	https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu
