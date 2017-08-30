@@ -43,15 +43,18 @@ class AWSMemreasRedisCache {
 			] );
 			self::$isInitialized = true;
 			self::$handle = $this;
-			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__.'::', 'PREDIS CLIENT INITIALIZED');
+			//Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__.'::', 'PREDIS CLIENT INITIALIZED');
 			//} catch ( \Predis\Connection\ConnectionException $ex ) {
 		//	error_log ( "exception ---> " . print_r ( $ex, true ) . PHP_EOL );
 		} catch ( \Exception $ex ) {
 			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__.'::$ex-->', $ex);
 		}
+		Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__.'::', 'SETTING IN REDIS');
 		$this->cache->set('foo', 'bar');
+		Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__.'::', 'Fetching from REDIS...');
 		Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__.'::', "Fetching from REDIS! ---> " . $this->cache->get('foo') . " for host --->" . gethostname ());
 		$this->cache->del ( 'foo' );
+		Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__.'::', 'DELETING from REDIS...');
 	}
 	public static function getHandle() {
 		if (! empty ( self::$isInitialized )) {
