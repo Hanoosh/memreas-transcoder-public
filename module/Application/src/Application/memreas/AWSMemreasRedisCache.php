@@ -31,6 +31,7 @@ class AWSMemreasRedisCache {
 		}		
 		
 		if (! $this->isCacheEnable) {
+			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__.'::$this->isCacheEnable-->', $this->isCacheEnable);
 			return;
 		}
 		

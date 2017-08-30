@@ -15,11 +15,9 @@ class MemreasConstants {
 	// MySQL section *for auto-scaling a separate Redis instance should be used
 	const TRANSCODERDB = 'YOUR_DB_NAME';
 
-
 	// Redis section v3.0.7 *for auto-scaling a separate Redis instance should be used
 	const REDIS_SERVER_ENDPOINT = "YOUR_REDIS_IP_ADDRESS"; //i.e. 10.0.0.1 
 	const REDIS_SERVER_USE = true;
-	const REDIS_SERVER_SESSION_ONLY = true;
 	const REDIS_SERVER_PORT = "6379";
 
 	//constants for processing
