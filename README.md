@@ -106,7 +106,8 @@ sudo add-apt-repository ppa:ondrej/php
 sudo apt-get install software-properties-common
 sudo apt-get update
 sudo apt-get install php5.6
-sudo apt-get install php5.6-mbstring php5.6-mcrypt php5.6-mysql php5.6-xml php5.6-curl
+//note gd is required below
+sudo apt-get install php5.6-mbstring php5.6-mcrypt php5.6-mysql php5.6-xml php5.6-curl php5-gd
 sudo nano /etc/apache2/mods-enabled/dir.conf
 //move index.php to front 
 	<IfModule mod_dir.c>
