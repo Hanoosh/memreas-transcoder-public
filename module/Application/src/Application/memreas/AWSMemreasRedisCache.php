@@ -28,6 +28,7 @@ class AWSMemreasRedisCache {
 			// port is open and available
 			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__.'::', 'PORT 6379 IS OPEN' );
 			fclose($fp);
+			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__.'::', 'fclose($fp) success' );
 		}		
 		
 		if (! $this->isCacheEnable) {
