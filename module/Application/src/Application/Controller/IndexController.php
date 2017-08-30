@@ -175,6 +175,10 @@ class IndexController extends AbstractActionController {
 			// At this point it's time to exit. The while loop is finished
 			// and/or the pid doesn't match.
 			//
+		} else {
+			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__ . '::$action--->', $action);
+			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__ . '::$json--->', $json);
+			
 		}
 	}
 	protected function processBacklog() {

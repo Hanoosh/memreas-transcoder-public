@@ -138,8 +138,16 @@ make test
 sudo make install
 sudo mkdir /etc/redis
 sudo cp /tmp/redis-stable/redis.conf /etc/redis
+
 sudo nano /etc/redis/redis.conf
 	supervised systemd
+
+//comment out redis RDB snapshots
+sudo nano /etc/redis/redis.conf
+	save ""
+	#save 900 1
+	#save 300 10
+	#save 60 10000
 sudo nano /etc/systemd/system/redis.service
     [Unit]
 	Description=Redis In-Memory Data Store
