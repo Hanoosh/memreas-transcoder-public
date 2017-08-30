@@ -3,13 +3,13 @@ memreas-transcoder-public
 
 Introduction
 ------------
-memreas transcoder is a php web based application the uses ffmpeg to transcode video and image formats.  Video input files such as (.avi, .mp4, etc.) can be transcoded to mp4, vp9 (webm), and hls including 4k support for Apple, GoPro, and standard 4k videos. Images can be resized and stored as needed.
+memreas transcoder is a php web based application the uses ffmpeg as a media transcoders.  Video input files such as (.avi, .mp4, etc.) can be transcoded to mp4, vp9 (webm), and hls including 4k support for Apple, GoPro, and standard 4k videos. Images can be resized for thumbnails and stored as needed.
 
-The transcoder is built to use Amazon Web Services (AWS) as it's backend but can be port to other Cloud based services based on your needs.
+The transcoder is built to use Amazon Web Services (AWS) as it's backend but can be ported to other Cloud based services based on your needs.
 
 The transcoder works as such
 
-1 - Video or image should be already stored in S3 Bucket
+1 - Video or image should be already stored in your S3 Bucket
 2 - Web request is made with appropriate parameters
 3 - For videos the transcoder will work on transcoding a single video at a time but will also allow for images to be resized
 4 - Upon completion the transcoder will store your transcoded video or images to your S3 bucket

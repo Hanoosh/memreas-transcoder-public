@@ -257,15 +257,9 @@ class MemreasTranscoder {
 			}
 			
 			if (isset ( $message_data )) {
-				if (getcwd () === '/var/www/memreas-dev-php-backend') {
-					// AWS ffmpeg && ffprobe
-					$this->ffmpegcmd = MemreasConstants::MEMREAS_TRANSCODER_FFMPEG;
-					$this->ffprobecmd = MemreasConstants::MEMREAS_TRANSCODER_FFPROBE;
-				} else {
-					// Local ffmpeg && ffprobe
-					$this->ffmpegcmd = MemreasConstants::MEMREAS_TRANSCODER_FFMPEG_LOCAL;
-					$this->ffprobecmd = MemreasConstants::MEMREAS_TRANSCODER_FFPROBE_LOCAL;
-				}
+				
+				$this->ffmpegcmd = MemreasConstants::MEMREAS_TRANSCODER_FFMPEG;
+				$this->ffprobecmd = MemreasConstants::MEMREAS_TRANSCODER_FFPROBE;
 				
 				// //////////////////////
 				// create work folders
@@ -430,7 +424,7 @@ class MemreasTranscoder {
 					$this->createThumbNails ();
 					
 					$this->memreas_media_metadata ['S3_files'] ['transcode_progress'] [] = 'thumbnails_complete';
-					$this->persistMedia ();
+					
 					
 					/*
 					 * Create transcode job array...
@@ -456,7 +450,7 @@ class MemreasTranscoder {
 							// set status to show web available
 							$this->transcode_status = "success_copyright";
 							// update media metadata and transcode transaction metadata
-							$this->persistMedia ();
+							
 							$this->persistTranscodeTransaction ();
 						} else {
 							Mlog::addone ( __CLASS__ . __METHOD__, '::$message_data [applyCopyrightOnServer]::NOTSET' );
@@ -474,7 +468,7 @@ class MemreasTranscoder {
 					$this->transcode_status = "success_web";
 					$this->pass = "1";
 					// update media metadata and transcode transaction metadata
-					$this->persistMedia ();
+					
 					$this->persistTranscodeTransaction ();
 					
 					/*
@@ -510,7 +504,7 @@ class MemreasTranscoder {
 					$this->pass = "1";
 					
 					// update media metadata and transcode transaction metadata
-					$this->persistMedia ();
+					
 					$this->persistTranscodeTransaction ();
 					
 					// End if ($is_video)
@@ -525,7 +519,7 @@ class MemreasTranscoder {
 					$this->memreas_media_metadata ['S3_files'] ['transcode_progress'] [] = 'audio_complete';
 					// update media metadata and transcode transaction
 					// metadata
-					$this->persistMedia ();
+					
 					$this->persistTranscodeTransaction ();
 				} else if ($this->is_image) {
 					// Image section
@@ -534,7 +528,7 @@ class MemreasTranscoder {
 					$this->memreas_media_metadata ['S3_files'] ['transcode_progress'] [] = 'thumbnails_complete';
 					// update media metadata and transcode transaction
 					// metadata
-					$this->persistMedia ();
+					
 					$this->persistTranscodeTransaction ();
 				}
 				
@@ -551,31 +545,16 @@ class MemreasTranscoder {
 				$this->pass = "1";
 				$this->transcode_end_time = $this->now ();
 				$this->transcode_job_duration = strtotime ( $this->transcode_end_time ) - strtotime ( $this->transcode_start_time );
-				$this->persistTranscodeTransaction ();
-				
-				/*
-				 * Update media to mark completion
-				 */
 				$this->memreas_media_metadata ['S3_files'] ['transcode_progress'] [] = 'transcode_complete';
 				$this->memreas_media_metadata ['S3_files'] ['transcode_status'] = $this->pass;
-				$this->persistMedia ();
+				$this->persistTranscodeTransaction ();
+				
 				
 				// Debugging - log table entry
 				Mlog::addone ( __CLASS__ . __METHOD__ . '::$this->persistMedia($this->memreas_media, 
                         $memreas_media_data_array)', $this->transcode_status );
 				Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__ . '::$this->memreas_media_metadata::after::', $this->memreas_media_metadata );
 			} // End if(isset($_POST))
-			  
-			//
-			  // Clear Redis Cache for user
-			  //
-			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__, 'AWSMemreasRedisCache::getHandle() - invalidate start' );
-			$redis = AWSMemreasRedisCache::getHandle ();
-			$redis->invalidateCache ( "listallmedia_" . $this->user_id );
-			$redis->invalidateCache ( "listnotification_" . $this->user_id );
-			$redis->invalidateCache ( "viewevents_is_my_event_" . $this->user_id );
-			$redis->invalidateCache ( "viewevents_is_friend_event_" . $this->user_id );
-			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__, 'AWSMemreasRedisCache::getHandle() - invalidate end' );
 		} catch ( \Exception $e ) {
 			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__ . '::Caught exception: ', $e->getMessage () );
 			//
@@ -805,49 +784,17 @@ class MemreasTranscoder {
 			 */
 			Mlog::addone ( $cm . __LINE__, '::Inside transcode $this->type --->' . $this->type );
 			
-			if ($this->type == 'copyright') {
-				// Sample command
-				// ffmpeg -i input.mp4 -vf drawtext="fontfile=/usr/share/fonts/TTF/Vera.ttf: \
-				// text='Stack Overflow': fontcolor=white: fontsize=24: box=1: boxcolor=black: \
-				// x=(w-text_w)/2: y=(h-text_h-line_h)/2" -codec:a copy output.flv
-				
-				/*
-				 * Add copyright as needed
-				 */
-				$copyrightMD5 = $this->copyright_array ['copyright_id_md5'];
-				Mlog::addone ( $cm . __LINE__ . '$this->copyright_array [copyright_id_md5]', $this->copyright_array ['copyright_id_md5'] );
-				$copyrightSHA256 = $this->copyright_array ['copyright_id_sha256'];
-				Mlog::addone ( $cm . __LINE__ . '$this->copyright_array [copyright_id_sha256]', $this->copyright_array ['copyright_id_sha256'] );
-				$mRight = "md5_" . $copyrightMD5 . " sha256_" . $copyrightSHA256;
-				Mlog::addone ( $cm . __LINE__ . '$mRight', $mRight );
-				$qv = ' -vf drawtext="fontfile=' . getcwd () . '/usr/share/fonts/memreas/segoescb.ttf:text=' . "'$mRight'" . ':fontsize=48:fontcolor=blue:x=0:y=0" ';
-				Mlog::addone ( $cm . __LINE__ . '$qv', $qv );
-				sleep ( 10 );
-				// $transcoded_file = $this->homeDir . self::CONVDIR . self::WEBDIR . $this->MediaFileName . $mpeg4ext;
-				// $transcoded_file_name = $this->MediaFileName . $mpeg4ext;
-				$path_parts = pathinfo ( $this->destRandMediaName );
-				$inscribed_file = $path_parts ['dirname'] . '/' . $path_parts ['basename'] . '.copy.' . $path_parts ['extension'];
-				Mlog::addone ( $cm . __LINE__ . '::$inscribed_file::', $inscribed_file );
-				// Mlog::addone ( $cm . __LINE__ ,$path_parts['dirname']);
-				// Mlog::addone ( $cm . __LINE__ ,$path_parts['basename']);
-				// Mlog::addone ( $cm . __LINE__ ,$path_parts['extension']);
-				$this->cmd = 'nice -' . $this->nice_priority . ' ' . $this->ffmpegcmd . ' -i  ' . $this->destRandMediaName . $qv . $inscribed_file . ' 2>&1';
-				Mlog::addone ( $cm . __LINE__ . '$this->cmd', $this->cmd );
-				Mlog::addone ( $cm . __LINE__ . '::$copyright::', $this->copyright );
-				$transcoded_file = $this->destRandMediaName;
-			} else if ($this->type == 'web') {
+			if ($this->type == 'web') {
 				/*
 				 * Test lossless with best compression
 				 */
 				$this->memreas_media_metadata ['S3_files'] ['type'] ['video'] ['width'] = (isset ( $ffprobe_json_array ['streams'] [0] ['width'] ) && ! empty ( $ffprobe_json_array ['streams'] [0] ['width'] )) ? $ffprobe_json_array ['streams'] [0] ['width'] : "";
 				$this->memreas_media_metadata ['S3_files'] ['type'] ['video'] ['height'] = (isset ( $ffprobe_json_array ['streams'] [0] ['height'] ) && ! empty ( $ffprobe_json_array ['streams'] [0] ['height'] )) ? $ffprobe_json_array ['streams'] [0] ['height'] : "";
 				
-				// 6-DEC-2015 - baseline mp4 cmd
 				$qv = ' -c:v libx264 ' . ' -profile:v high -level 4.0 ' . ' -preset ' . $this->compression_preset_web . ' -crf 18 ' . ' -pix_fmt yuv420p ' . ' -movflags ' . ' +faststart ' . ' -c:a aac ' . ' -strict experimental ' . '-b:a 128k ';
 				
 				//
-				// apple doesn't support h.265 playback as of 9-SEP-2015 so we
-				// need this for download but can't use for 4k??
+				// need this for download but can't use for 4k
 				//
 				$transcoded_file = $this->homeDir . self::CONVDIR . self::WEBDIR . $this->MediaFileName . $mpeg4ext;
 				$transcoded_file_name = $this->MediaFileName . $mpeg4ext;
@@ -894,31 +841,12 @@ class MemreasTranscoder {
 				throw new \Exception ( "MemreasTranscoder $this->type not found." );
 			}
 			
-			$this->pass = 0;
 			//
 			// exec ffmpeg operation
 			//
+			$this->pass = 0;
 			Mlog::addone ( $cm . __LINE__, '$this->cmd-->' . $this->cmd );
 			$this->execFFMPEG ( $transcoded_file );
-			
-			if ($this->type == 'copyright') {
-				//
-				// Delete original and replace with inscribed file
-				//
-				shell_exec ( "rm $this->destRandMediaName" );
-				shell_exec ( "mv $inscribed_file $this->destRandMediaName" );
-				shell_exec ( "rm $inscribed_file" );
-				
-				//
-				// Change to inscribed file for web input
-				//
-				$this->copyright_array ['fileCheckSumMD5'] = md5_file ( $this->destRandMediaName );
-				$this->copyright_array ['fileCheckSumSHA1'] = sha1_file ( $this->destRandMediaName );
-				$this->copyright_array ['fileCheckSumSHA256'] = hash_file ( 'sha256', $this->destRandMediaName );
-				$this->copyright_array ['copyright_inscribed'] = 1;
-				$this->copyright = json_encode ( $this->copyright_array );
-				Mlog::addone ( $cm . __LINE__ . '::$copyright::', $this->copyright );
-			}
 			
 			//
 			// Push to S3
@@ -1023,7 +951,6 @@ class MemreasTranscoder {
 				$this->transcode_job_meta [$this->type] ["output_end_time"] = date ( "Y-m-d H:i:s" );
 			}
 			$this->persistTranscodeTransaction ();
-			$this->persistMedia ();
 		} catch ( \Exception $e ) {
 			$this->pass = 0;
 			error_log ( "transcoder $this->type failed - op -->" . $op . PHP_EOL );
@@ -1035,8 +962,6 @@ class MemreasTranscoder {
 			$this->transcode_job_meta [$this->type] ["output_end_time"] = date ( "Y-m-d H:i:s" );
 			$this->error_message = $e->getMessage ();
 			$this->persistTranscodeTransaction ();
-			// persist media data also
-			$this->persistMedia ();
 			throw $e;
 		}
 		return $op;
@@ -1119,55 +1044,6 @@ class MemreasTranscoder {
 	function getMemreasTranscoderTables() {
 		return new MemreasTranscoderTables ( $this->service_locator );
 	}
-	public function persistCopyright() {
-		try {
-			/*
-			 * Fetch Copyright entry
-			 */
-			$row = $this->getMemreasTranscoderTables ()->getMediaTable ()->fetchTranscodeTransactionByMediaId ( $this->media_id );
-			
-			/*
-			 * Store media
-			 */
-			$this->json_metadata = json_encode ( $this->memreas_media_metadata );
-			$data_array = [ ];
-			$data_array ['metadata'] = ! empty ( $this->json_metadata ) ? $this->json_metadata : '';
-			$data_array ['transcode_status'] = ! empty ( $this->transcode_status ) ? $this->transcode_status : '';
-			$data_array ['update_date'] = $this->now ();
-			$this->memreas_media->exchangeArray ( $data_array );
-			$media_id = $this->getMemreasTranscoderTables ()->getMediaTable ()->saveMedia ( $this->memreas_media );
-		} catch ( \Exception $e ) {
-			$error_data = [ ];
-			$error_data ['error_line'] = $e->getLine ();
-			$error_data ['error_message'] = $e->getMessage ();
-			$error_data ['error_trace'] = $e->getTrace ();
-			
-			Mlog::addone ( __CLASS__ . __METHOD__ . "::line::" . __LINE__ . '::Caught exception: ', json_encode ( $error_data, JSON_PRETTY_PRINT ) );
-			throw $e;
-		}
-	}
-	public function persistMedia() {
-		try {
-			/*
-			 * Store media
-			 */
-			$this->json_metadata = json_encode ( $this->memreas_media_metadata );
-			$data_array = [ ];
-			$data_array ['metadata'] = ! empty ( $this->json_metadata ) ? $this->json_metadata : '';
-			$data_array ['transcode_status'] = ! empty ( $this->transcode_status ) ? $this->transcode_status : '';
-			$data_array ['update_date'] = $this->now ();
-			$this->memreas_media->exchangeArray ( $data_array );
-			$media_id = $this->getMemreasTranscoderTables ()->getMediaTable ()->saveMedia ( $this->memreas_media );
-		} catch ( \Exception $e ) {
-			$error_data = [ ];
-			$error_data ['error_line'] = $e->getLine ();
-			$error_data ['error_message'] = $e->getMessage ();
-			$error_data ['error_trace'] = $e->getTrace ();
-			
-			Mlog::addone ( __CLASS__ . __METHOD__ . "::line::" . __LINE__ . '::Caught exception: ', json_encode ( $error_data, JSON_PRETTY_PRINT ) );
-			throw $e;
-		}
-	}
 	public function fetchTranscodeTransactionByMediaId() {
 		$row = $this->getMemreasTranscoderTables ()->getTranscodeTransactionTable ()->fetchTranscodeTransactionByMediaId ( $this->media_id );
 		
@@ -1187,6 +1063,7 @@ class MemreasTranscoder {
 			$data_array ['transcode_status'] = ! empty ( $this->transcode_status ) ? $this->transcode_status : 'pending';
 			$data_array ['pass_fail'] = ! empty ( $this->pass ) ? $this->pass : 0;
 			$data_array ['metadata'] = ! empty ( $this->transcode_job_meta ) ? json_encode ( $this->transcode_job_meta ) : null;
+			$data_array ['media_metadata'] = ! empty ( $this->memreas_media_metadata) ? json_encode ( $this->memreas_media_metadata) : null;
 			$data_array ['error_message'] = ! empty ( $this->error_message ) ? $this->error_message : 0;
 			$data_array ['server_lock'] = ! empty ( $this->server_lock ) ? $this->server_lock : null;
 			$data_array ['priority'] = ! empty ( $this->priority ) ? $this->priority : 'low';

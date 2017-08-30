@@ -59,6 +59,7 @@ CREATE TABLE `transcodetransaction` (
   `transcode_status` varchar(45) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'pending',
   `pass_fail` bit(1) NOT NULL,
   `metadata` text COLLATE utf8_unicode_ci,
+  `media_metadata` text COLLATE utf8_unicode_ci,
   `error_message` text COLLATE utf8_unicode_ci,
   `transcode_job_duration` int(11) DEFAULT NULL,
   `server_lock` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,

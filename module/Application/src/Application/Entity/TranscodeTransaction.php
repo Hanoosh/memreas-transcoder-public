@@ -110,6 +110,13 @@ class TranscodeTransaction {
 	
 	/**
 	 *
+	 * @var string @ORM\Column(name="media_metadata", type="json_array",
+	 *      nullable=true)
+	 */
+	public $media_metadata;
+
+	/**
+	 *
 	 * @var string @ORM\Column(name="error_message", type="json_array",
 	 *      nullable=true)
 	 */
