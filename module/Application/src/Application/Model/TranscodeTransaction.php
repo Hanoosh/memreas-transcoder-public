@@ -20,6 +20,7 @@ class TranscodeTransaction {
 	public $transcode_status = NULL;
 	public $pass_fail = NULL;
 	public $metadata = NULL;
+	public $media_metadata = NULL;
 	public $error_message = NULL;
 	public $server_lock = NULL;
 	public $priority = NULL;
@@ -39,6 +40,7 @@ class TranscodeTransaction {
 		$this->transcode_status = (isset ( $data ['transcode_status'] )) ? $data ['transcode_status'] : $this->transcode_status;
 		$this->pass_fail = (isset ( $data ['pass_fail'] )) ? $data ['pass_fail'] : $this->pass_fail;
 		$this->metadata = (isset ( $data ['metadata'] )) ? $data ['metadata'] : $this->metadata;
+		$this->media_metadata = (isset ( $data ['media_metadata'] )) ? $data ['media_metadata'] : $this->media_metadata;
 		$this->error_message = (isset ( $data ['error_message'] )) ? $data ['error_message'] : $this->error_message;
 		$this->server_lock = (isset ( $data ['server_lock'] )) ? $data ['server_lock'] : $this->server_lock;
 		$this->priority = (isset ( $data ['priority'] )) ? $data ['priority'] : $this->priority;

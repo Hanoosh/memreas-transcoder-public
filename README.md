@@ -439,8 +439,7 @@ class MemreasConstants {
 	const CLOUDFRONT_HLSSTREAMING_HOST = 'YOUR_CLOUDFRONT_URL'; //optional
 
 	// MySQL section *for auto-scaling a separate Redis instance should be used
-	const MEMREASDB = 'YOUR_DB_NAME';
-	const MEMREASBEDB = 'YOUR_DB_NAME';
+	const TRANSCODERDB = 'YOUR_DB_NAME';
 
 
 	// Redis section v3.0.7 *for auto-scaling a separate Redis instance should be used
