@@ -176,7 +176,7 @@ class IndexController extends AbstractActionController {
 			// and/or the pid doesn't match.
 			//
 		} else {
-			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__ . '::$action--->', $REQUEST);
+			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__ . '::$action--->', $_REQUEST);
 			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__ . '::$action--->', $action);
 			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__ . '::$json--->', $json);
 		}
