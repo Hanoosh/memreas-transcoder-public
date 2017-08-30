@@ -154,8 +154,6 @@ class Module {
 						 */
 						
 						// Database Tables...
-						// memreas base tables
-						// Transcode related tables
 						'Application\Model\TranscodeTransactionTable' => function ($sm) {
 							$tableGateway = $sm->get ( 'TranscodeTransactionTableGateway' );
 							$table = new TranscodeTransactionTable ( $tableGateway );
