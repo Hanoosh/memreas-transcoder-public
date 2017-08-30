@@ -213,11 +213,8 @@ class MemreasTranscoder {
 			$this->transcode_start_time = $this->now ();
 			
 			//
-			// Media data
+			// Log start time...
 			//
-			$this->memreas_media = $this->getMemreasTranscoderTables ()->getMediaTable ()->getMedia ( $this->media_id );
-			$this->memreas_media_metadata = json_decode ( $this->memreas_media->metadata, true );
-			
 			$starttime = date ( 'Y-m-d H:i:s' );
 			$this->memreas_media_metadata ['S3_files'] ['transcode_progress'] = array ();
 			$this->memreas_media_metadata ['S3_files'] ['transcode_progress'] [] = 'transcode_started';
