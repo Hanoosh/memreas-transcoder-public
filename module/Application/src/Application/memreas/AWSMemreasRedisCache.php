@@ -45,10 +45,10 @@ class AWSMemreasRedisCache {
 		//} catch ( \Predis\Connection\ConnectionException $ex ) {
 		//	error_log ( "exception ---> " . print_r ( $ex, true ) . PHP_EOL );
 		} catch ( \Exception $ex ) {
-			error_log ( "predis connection exception ---> " . print_r ( $ex, true ) . PHP_EOL );
+			Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__.'::$ex-->', $ex);
 		}
 		$this->cache->set('foo', 'bar');
-		error_log("Fetching from REDIS! ---> " . $this->cache->get('foo') . " for host --->" . gethostname () . PHP_EOL);
+		Mlog::addone ( __CLASS__ . __METHOD__ . __LINE__.'::', "Fetching from REDIS! ---> " . $this->cache->get('foo') . " for host --->" . gethostname ());
 		$this->cache->del ( 'foo' );
 	}
 	public static function getHandle() {
