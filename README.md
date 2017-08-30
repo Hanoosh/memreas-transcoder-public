@@ -3,7 +3,7 @@ memreas-transcoder-public
 
 Introduction
 ------------
-memreas transcoder is a php web based application the uses ffmpeg as a media transcoders.  Video input files such as (.avi, .mp4, etc.) can be transcoded to mp4, vp9 (webm), and hls including 4k support for Apple, GoPro, and standard 4k videos. Images can be resized for thumbnails and stored as needed.
+memreas transcoder is a php web based application the uses ffmpeg as a media transcoder.  Video input files such as (.avi, .mp4, etc.) can be transcoded to mp4, vp9 (webm), and hls including 4k support for Apple, GoPro, and standard 4k videos. Images can be resized for thumbnails and stored as needed.
 
 The transcoder is built to use Amazon Web Services (AWS) as it's backend but can be ported to other Cloud based services based on your needs.
 
@@ -524,5 +524,6 @@ sudo vi /etc/rc.local
 
 //
 // Server should be setup and ready to test
-// - reboot the server and check the php_errors.log file to see check for errors
+// - reboot the server and edit the test_transcoder.sh to test
+// - you can use tpel.sh to tail the php_errors.log file
 //
