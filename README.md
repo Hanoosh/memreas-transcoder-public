@@ -21,8 +21,8 @@ The transcoder is also equipped to handle auto-scaling and will process input vi
 Requirements
 ------------
 - Amazon EC2 Instance 
-- Amzaon Web Servies S3 Bucket
-- Amzaon Web Servies SES to receive notification emails
+- Amazon Web Servies S3 Bucket
+- Amazon Web Servies SES to receive notification emails
 - Github account to store/fetch your latest updates for new worker servers
 - Redis installation: used to manage multiple workers
 
